@@ -1,6 +1,6 @@
 ﻿# MERN Recipe Sharing Platform
 
-This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing platform. It supports authentication, recipe management, social features, recommendations, comments, nutritional info, shopping list, password reset, and more.
+This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing platform. It supports authentication, recipe management, social features, recommendations, comments, nutritional info, shopping list, and more.
 
 ## Features
 
@@ -16,7 +16,7 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 - Recipe recommendations (top-rated, personalized)
 - Nutritional information (calories, protein, fat, carbs)
 - Shopping list generator (copy ingredients)
-- Password reset flow (request and confirm)
+- Account deletion functionality
 - Responsive/mobile-first design
 - API documentation and code comments
 
@@ -49,8 +49,6 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 ### Auth
 - `POST /auth/login` — Login
 - `POST /auth/register` — Register
-- `POST /auth/reset-password` — Request password reset
-- `POST /auth/confirm-reset` — Confirm password reset
 
 ### Recipes
 - `GET /recipes` — List/search recipes
@@ -65,6 +63,7 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 ### Users
 - `GET /users/me` — Get current user
 - `PUT /users/me` — Update profile
+- `DELETE /users/me` — Delete account
 - `GET /users/me/recipes` — User's recipes
 - `GET /users/me/favorites` — User's favorites
 - `POST /users/:id/follow` — Follow user
@@ -86,7 +85,7 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 - Add and delete comments on recipes
 - Share recipes on social media
 - View nutritional info and generate shopping lists
-- Reset password via email link
+- Delete your account if needed
 - Enjoy a responsive experience on all devices
 
 ## Testing Flows
@@ -100,7 +99,7 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 - Follow/unfollow users
 - Add/delete comments
 - Share recipes
-- Password reset request and confirmation
+- Account deletion
 - Shopping list copy
 
 ## Code Documentation

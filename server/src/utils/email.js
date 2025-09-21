@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 
 // Create transporter (using Gmail for demo - in production use proper SMTP)
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER || 'your-email@gmail.com',
@@ -43,7 +43,7 @@ export const sendVerificationEmail = async (email, token) => {
 export const sendPasswordResetEmail = async (email, token) => {
   try {
     const transporter = createTransporter()
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${token}`
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/confirm?token=${token}`
     
     await transporter.sendMail({
       from: process.env.EMAIL_USER || 'your-email@gmail.com',

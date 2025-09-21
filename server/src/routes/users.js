@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { authRequired } from '../middleware/auth.js'
 import User from '../models/User.js'
 import Recipe from '../models/Recipe.js'
+import Comment from '../models/Comment.js'
 
 const router = express.Router()
 
@@ -54,6 +55,39 @@ router.get('/me/favorites', authRequired, async (req, res, next) => {
     const list = await Recipe.find({ favorites: req.user.id }).lean()
     res.json({ items: list.map((doc) => mapRecipe(doc, req.user.id)) })
   } catch (e) { next(e) }
+})
+
+// Delete user account
+router.delete('/me', authRequired, async (req, res, next) => {
+  try {
+    const userId = req.user.id
+    
+    // Delete all user's recipes
+    await Recipe.deleteMany({ ownerId: userId })
+    
+    // Delete all user's comments
+    await Comment.deleteMany({ user: userId })
+    
+    // Remove user from favorites in all recipes
+    await Recipe.updateMany(
+      { favorites: userId },
+      { $pull: { favorites: userId } }
+    )
+    
+    // Remove user's ratings from all recipes
+    await Recipe.updateMany(
+      {},
+      { $unset: { [`ratings.${userId}`]: 1 } }
+    )
+    
+    // Delete the user account
+    await User.findByIdAndDelete(userId)
+    
+    res.json({ message: 'Account deleted successfully' })
+  } catch (e) { 
+    console.error('Delete account error:', e)
+    next(e) 
+  }
 })
 
 export default router

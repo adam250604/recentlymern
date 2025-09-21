@@ -10,9 +10,10 @@ import rateLimit from 'express-rate-limit'
 import authRoutes from './routes/auth.js'
 import recipeRoutes from './routes/recipes.js'
 import userRoutes from './routes/users.js'
+import commentRoutes from './routes/comments.js'
 import { connectIfConfigured } from './utils/db.js'
 
-dotenv.config()
+dotenv.config({ path: '../server.env' })
 const app = express()
 
 const __filename = fileURLToPath(import.meta.url)
@@ -34,6 +35,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }))
 app.use('/api/auth', authRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/comments', commentRoutes)
 
 // 404
 app.use((req, res) => res.status(404).json({ message: 'Not found' }))

@@ -2,16 +2,18 @@
 import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
 import { toast } from 'react-toastify'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export default function Profile() {
   const { user, logout } = useAuth()
   const { id } = useParams()
+  const navigate = useNavigate()
   const viewingOwn = !id || id === user?.id
   const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '' })
   const [loading, setLoading] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
   const [profileUser, setProfileUser] = useState(null)
+  const [deletingAccount, setDeletingAccount] = useState(false)
 
   useEffect(() => {
     if (viewingOwn) {
@@ -66,6 +68,36 @@ export default function Profile() {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    const confirmMessage = `Are you sure you want to delete your account? This action cannot be undone and will permanently delete:
+    
+• All your recipes
+• All your comments
+• Your profile and account data
+
+Type "DELETE" to confirm:`
+
+    const userInput = window.prompt(confirmMessage)
+    
+    if (userInput !== 'DELETE') {
+      toast.info('Account deletion cancelled')
+      return
+    }
+
+    setDeletingAccount(true)
+    try {
+      await api.delete('/users/me')
+      toast.success('Account deleted successfully')
+      logout()
+      navigate('/')
+    } catch (error) {
+      toast.error('Failed to delete account')
+      console.error('Delete account error:', error)
+    } finally {
+      setDeletingAccount(false)
+    }
+  }
+
   if (!profileUser) return <div>Loading...</div>
 
   if (viewingOwn) {
@@ -84,6 +116,22 @@ export default function Profile() {
         </button>
         <button type="button" onClick={logout}>
           Logout
+        </button>
+        <button 
+          type="button" 
+          onClick={handleDeleteAccount}
+          disabled={deletingAccount}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            cursor: deletingAccount ? 'not-allowed' : 'pointer',
+            opacity: deletingAccount ? 0.6 : 1
+          }}
+        >
+          {deletingAccount ? 'Deleting Account...' : 'Delete Account'}
         </button>
       </form>
     )
