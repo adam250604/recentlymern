@@ -1,0 +1,48 @@
+﻿:root {
+  --bg: #0b0c10;
+  --panel: #121417;
+  --text: #eaf0f6;
+  --muted: #9aa4b2;
+  --primary: #6c9ef8;
+  --primary-600: #4b83f5;
+  --danger: #f25f5c;
+  --border: #1f2329;
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text); }
+
+.app { min-height: 100%; display: flex; flex-direction: column; }
+.container { width: min(1100px, 100%); margin: 0 auto; padding: 16px; }
+
+.navbar { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(6px); background: color-mix(in oklab, var(--bg) 80%, transparent); border-bottom: 1px solid var(--border); }
+.navbar-inner { display: flex; align-items: center; gap: 16px; padding: 12px 16px; }
+.brand { font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: 0.2px; }
+.navlinks a { color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 8px; }
+.navlinks a.active { color: var(--text); background: #151922; }
+.spacer { margin-left: auto; }
+
+footer { margin-top: auto; padding: 16px; text-align: center; color: var(--muted); border-top: 1px solid var(--border); }
+
+input, select, textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f1115; color: var(--text); outline: none; }
+label { color: var(--muted); font-size: 0.9rem; }
+
+.btn { padding: 10px 14px; border-radius: 10px; border: 1px solid #24406e; background: linear-gradient(180deg, #1a2b49, #0f1c36); color: #cfe1ff; cursor: pointer; }
+.btn:hover { background: linear-gradient(180deg, #21365c, #122243); }
+.btn.ghost { background: transparent; border-color: var(--border); color: var(--text); }
+
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.card { grid-column: span 4; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.card-body { padding: 10px 12px; display: grid; gap: 6px; }
+.card-title { margin: 0; font-size: 1.05rem; }
+.card-meta { color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 1024px) {
+  .card { grid-column: span 6; }
+}
+@media (max-width: 640px) {
+  .card { grid-column: span 12; }
+  .navbar-inner { padding: 10px 12px; }
+}

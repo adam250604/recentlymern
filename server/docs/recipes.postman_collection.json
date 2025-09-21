@@ -1,0 +1,35 @@
+﻿{
+  "info": {
+    "name": "Recipes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {"name": "Health", "request": {"method": "GET", "url": "http://localhost:8000/api/health"}},
+    {"name": "Register", "request": {"method": "POST", "url": "http://localhost:8000/api/auth/register", "body": {"mode": "raw", "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}"}, "header": [{"key": "Content-Type", "value": "application/json"}]}},
+    {"name": "Login", "request": {"method": "POST", "url": "http://localhost:8000/api/auth/login", "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}"}, "header": [{"key": "Content-Type", "value": "application/json"}]}},
+    {"name": "Request Password Reset", "request": {"method": "POST", "url": "http://localhost:8000/api/auth/reset-password/request", "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@example.com\"\n}"}, "header": [{"key": "Content-Type", "value": "application/json"}]}},
+    {"name": "Confirm Password Reset", "request": {"method": "POST", "url": "http://localhost:8000/api/auth/reset-password/confirm", "body": {"mode": "raw", "raw": "{\n  \"token\": \"<resetToken>\",\n  \"password\": \"newpassword\"\n}"}, "header": [{"key": "Content-Type", "value": "application/json"}]}},
+    {"name": "List Recipes (paginated)", "request": {"method": "GET", "url": "http://localhost:8000/api/recipes?page=1&limit=10&q=&category=&sort="}},
+    {"name": "Get Recipe", "request": {"method": "GET", "url": "http://localhost:8000/api/recipes/1"}},
+    {"name": "Create Recipe (multipart)", "request": {"method": "POST", "url": "http://localhost:8000/api/recipes", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [
+      {"key": "title", "value": "Demo"},
+      {"key": "category", "value": "breakfast"},
+      {"key": "cookingTime", "value": "15"},
+      {"key": "difficulty", "value": "easy"},
+      {"key": "ingredients[0]", "value": "Eggs"},
+      {"key": "instructions[0]", "value": "Beat eggs"},
+      {"key": "image", "type": "file"}
+    ]}}},
+    {"name": "Update Recipe (multipart)", "request": {"method": "PUT", "url": "http://localhost:8000/api/recipes/1", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [
+      {"key": "title", "value": "Updated Demo"},
+      {"key": "image", "type": "file"}
+    ]}}},
+    {"name": "Favorite Recipe", "request": {"method": "POST", "url": "http://localhost:8000/api/recipes/1/favorite", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}]}},
+    {"name": "Unfavorite Recipe", "request": {"method": "DELETE", "url": "http://localhost:8000/api/recipes/1/favorite", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}]}},
+    {"name": "Rate Recipe", "request": {"method": "POST", "url": "http://localhost:8000/api/recipes/1/rating", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\n  \"value\": 5\n}"}}},
+    {"name": "Get My Profile", "request": {"method": "GET", "url": "http://localhost:8000/api/users/me", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}]}},
+    {"name": "Update My Profile", "request": {"method": "PUT", "url": "http://localhost:8000/api/users/me", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\n  \"name\": \"New Name\"\n}"}}},
+    {"name": "Get My Recipes", "request": {"method": "GET", "url": "http://localhost:8000/api/users/me/recipes", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}]}},
+    {"name": "Get My Favorites", "request": {"method": "GET", "url": "http://localhost:8000/api/users/me/favorites", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}]}}
+  ]
+}
