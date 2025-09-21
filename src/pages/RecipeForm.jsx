@@ -14,6 +14,12 @@ export default function RecipeForm({ mode }) {
   const [instructions, setInstructions] = useState([''])
   const [imageFile, setImageFile] = useState(null)
   const [category, setCategory] = useState('')
+  const [nutritionalInfo, setNutritionalInfo] = useState({
+    calories: '',
+    protein: '',
+    fat: '',
+    carbs: ''
+  })
 
   useEffect(() => {
     if (isEdit && id) {
@@ -24,6 +30,7 @@ export default function RecipeForm({ mode }) {
         setCategory(data.category || '')
         setCookingTime(data.cookingTime ?? '')
         setDifficulty(data.difficulty || 'easy')
+        setNutritionalInfo(data.nutritionalInfo || { calories: '', protein: '', fat: '', carbs: '' })
       })
     }
   }, [isEdit, id])
@@ -31,6 +38,8 @@ export default function RecipeForm({ mode }) {
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
+      console.log('Form data before submission:', { title, category, cookingTime, difficulty, ingredients, instructions, nutritionalInfo })
+      
       const form = new FormData()
       form.append('title', title)
       form.append('category', category)
@@ -43,7 +52,34 @@ export default function RecipeForm({ mode }) {
       // Filter out empty ingredients/instructions
       ingredients.filter(v => v && v.trim()).forEach((v, idx) => form.append(`ingredients[${idx}]`, v))
       instructions.filter(v => v && v.trim()).forEach((v, idx) => form.append(`instructions[${idx}]`, v))
+      
+      // Add nutritional information
+      const nutritionData = {}
+      if (nutritionalInfo.calories && !isNaN(Number(nutritionalInfo.calories))) {
+        nutritionData.calories = Number(nutritionalInfo.calories)
+      }
+      if (nutritionalInfo.protein && !isNaN(Number(nutritionalInfo.protein))) {
+        nutritionData.protein = Number(nutritionalInfo.protein)
+      }
+      if (nutritionalInfo.fat && !isNaN(Number(nutritionalInfo.fat))) {
+        nutritionData.fat = Number(nutritionalInfo.fat)
+      }
+      if (nutritionalInfo.carbs && !isNaN(Number(nutritionalInfo.carbs))) {
+        nutritionData.carbs = Number(nutritionalInfo.carbs)
+      }
+      if (Object.keys(nutritionData).length > 0) {
+        // Send each nutritional field separately for FormData
+        Object.keys(nutritionData).forEach(key => {
+          form.append(`nutritionalInfo.${key}`, nutritionData[key])
+        })
+      }
+      
       if (imageFile) form.append('image', imageFile)
+      
+      console.log('FormData contents:')
+      for (let [key, value] of form.entries()) {
+        console.log(key, value)
+      }
 
       if (isEdit) {
         await api.put(`/recipes/${id}`, form)
@@ -55,7 +91,9 @@ export default function RecipeForm({ mode }) {
         navigate(`/recipes/${data.id || ''}`)
       }
     } catch (e2) {
-      toast.error('Failed to save recipe')
+      console.error('Recipe save error:', e2)
+      const errorMessage = e2.response?.data?.message || 'Failed to save recipe'
+      toast.error(errorMessage)
     }
   }
 
@@ -117,6 +155,50 @@ export default function RecipeForm({ mode }) {
 
       <label>Image</label>
       <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+
+      <h3>Nutritional Information (Optional)</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div>
+          <label>Calories</label>
+          <input 
+            type="number" 
+            min="0" 
+            value={nutritionalInfo.calories} 
+            onChange={(e) => setNutritionalInfo(prev => ({ ...prev, calories: e.target.value }))} 
+            placeholder="e.g. 250"
+          />
+        </div>
+        <div>
+          <label>Protein (g)</label>
+          <input 
+            type="number" 
+            min="0" 
+            value={nutritionalInfo.protein} 
+            onChange={(e) => setNutritionalInfo(prev => ({ ...prev, protein: e.target.value }))} 
+            placeholder="e.g. 15"
+          />
+        </div>
+        <div>
+          <label>Fat (g)</label>
+          <input 
+            type="number" 
+            min="0" 
+            value={nutritionalInfo.fat} 
+            onChange={(e) => setNutritionalInfo(prev => ({ ...prev, fat: e.target.value }))} 
+            placeholder="e.g. 8"
+          />
+        </div>
+        <div>
+          <label>Carbs (g)</label>
+          <input 
+            type="number" 
+            min="0" 
+            value={nutritionalInfo.carbs} 
+            onChange={(e) => setNutritionalInfo(prev => ({ ...prev, carbs: e.target.value }))} 
+            placeholder="e.g. 30"
+          />
+        </div>
+      </div>
 
       <button type="submit">{isEdit ? 'Update' : 'Create'}</button>
     </form>

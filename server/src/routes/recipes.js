@@ -24,12 +24,36 @@ const createSchema = Joi.object({
   category: Joi.string().allow(''),
   cookingTime: Joi.number().integer().min(0).optional(),
   difficulty: Joi.string().valid('easy', 'medium', 'hard').optional(),
+  ingredients: Joi.array().items(Joi.string()).optional(),
+  instructions: Joi.array().items(Joi.string()).optional(),
+  nutritionalInfo: Joi.object({
+    calories: Joi.number().min(0).optional(),
+    protein: Joi.number().min(0).optional(),
+    fat: Joi.number().min(0).optional(),
+    carbs: Joi.number().min(0).optional()
+  }).optional(),
+  'nutritionalInfo.calories': Joi.number().min(0).optional(),
+  'nutritionalInfo.protein': Joi.number().min(0).optional(),
+  'nutritionalInfo.fat': Joi.number().min(0).optional(),
+  'nutritionalInfo.carbs': Joi.number().min(0).optional()
 })
 const updateSchema = Joi.object({
   title: Joi.string().min(2).max(200).optional(),
   category: Joi.string().allow('').optional(),
   cookingTime: Joi.number().integer().min(0).optional(),
   difficulty: Joi.string().valid('easy', 'medium', 'hard').optional(),
+  ingredients: Joi.array().items(Joi.string()).optional(),
+  instructions: Joi.array().items(Joi.string()).optional(),
+  nutritionalInfo: Joi.object({
+    calories: Joi.number().min(0).optional(),
+    protein: Joi.number().min(0).optional(),
+    fat: Joi.number().min(0).optional(),
+    carbs: Joi.number().min(0).optional()
+  }).optional(),
+  'nutritionalInfo.calories': Joi.number().min(0).optional(),
+  'nutritionalInfo.protein': Joi.number().min(0).optional(),
+  'nutritionalInfo.fat': Joi.number().min(0).optional(),
+  'nutritionalInfo.carbs': Joi.number().min(0).optional()
 })
 
 function mapRecipe(doc, userId) {
@@ -47,6 +71,7 @@ function mapRecipe(doc, userId) {
     category: doc.category || '',
     cookingTime: doc.cookingTime ?? undefined,
     difficulty: doc.difficulty || undefined,
+    nutritionalInfo: doc.nutritionalInfo || {},
     avgRating: doc.avgRating ?? 0,
     isFavorite: isFav,
     userRating,
@@ -106,6 +131,30 @@ router.get('/', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
+router.get('/recommendations', authRequired, async (req, res, next) => {
+  try {
+    // Get user's favorite categories and high-rated recipes
+    const userRecipes = await Recipe.find({ ownerId: req.user.id }).lean()
+    const userFavorites = await Recipe.find({ favorites: req.user.id }).lean()
+    
+    // Get categories from user's recipes and favorites
+    const userCategories = [...new Set([
+      ...userRecipes.map(r => r.category).filter(Boolean),
+      ...userFavorites.map(r => r.category).filter(Boolean)
+    ])]
+    
+    // Find recipes in similar categories, excluding user's own recipes
+    const recommendations = await Recipe.find({
+      ownerId: { $ne: req.user.id },
+      category: { $in: userCategories }
+    }).sort({ avgRating: -1, createdAt: -1 }).limit(6).lean()
+    
+    const userId = req.user.id
+    const items = recommendations.map((doc) => mapRecipe(doc, userId))
+    res.json(items)
+  } catch (e) { next(e) }
+})
+
 router.get('/:id', async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Not found' })
@@ -132,11 +181,30 @@ router.post('/', authRequired, (req, res, next) => {
 
 async function createHandler(req, res, next) {
   try {
+    console.log('Recipe creation request body:', req.body)
     const { value, error } = createSchema.validate(req.body)
-    if (error) return res.status(400).json({ message: error.message })
+    if (error) {
+      console.log('Validation error:', error.message)
+      return res.status(400).json({ message: error.message })
+    }
 
     const ingredients = readArrayFields(req.body, 'ingredients')
     const instructions = readArrayFields(req.body, 'instructions')
+
+    // Parse nutritional information from FormData
+    const nutritionalInfo = {}
+    if (req.body['nutritionalInfo.calories']) {
+      nutritionalInfo.calories = Number(req.body['nutritionalInfo.calories'])
+    }
+    if (req.body['nutritionalInfo.protein']) {
+      nutritionalInfo.protein = Number(req.body['nutritionalInfo.protein'])
+    }
+    if (req.body['nutritionalInfo.fat']) {
+      nutritionalInfo.fat = Number(req.body['nutritionalInfo.fat'])
+    }
+    if (req.body['nutritionalInfo.carbs']) {
+      nutritionalInfo.carbs = Number(req.body['nutritionalInfo.carbs'])
+    }
 
     const { imageUrl, thumbUrl } = await processImage(req.file)
 
@@ -147,6 +215,7 @@ async function createHandler(req, res, next) {
       difficulty: value.difficulty,
       ingredients,
       instructions,
+      nutritionalInfo: Object.keys(nutritionalInfo).length > 0 ? nutritionalInfo : (value.nutritionalInfo || {}),
       imageUrl: imageUrl || 'https://picsum.photos/800/600',
       thumbUrl: thumbUrl || imageUrl,
       avgRating: 0,
@@ -186,12 +255,32 @@ async function updateHandler(req, res, next) {
     const ingredients = readArrayFields(req.body, 'ingredients')
     const instructions = readArrayFields(req.body, 'instructions')
 
+    // Parse nutritional information from FormData
+    const nutritionalInfo = {}
+    if (req.body['nutritionalInfo.calories']) {
+      nutritionalInfo.calories = Number(req.body['nutritionalInfo.calories'])
+    }
+    if (req.body['nutritionalInfo.protein']) {
+      nutritionalInfo.protein = Number(req.body['nutritionalInfo.protein'])
+    }
+    if (req.body['nutritionalInfo.fat']) {
+      nutritionalInfo.fat = Number(req.body['nutritionalInfo.fat'])
+    }
+    if (req.body['nutritionalInfo.carbs']) {
+      nutritionalInfo.carbs = Number(req.body['nutritionalInfo.carbs'])
+    }
+
     if (value.title !== undefined) doc.title = value.title
     if (value.category !== undefined) doc.category = value.category
     if (value.cookingTime !== undefined) doc.cookingTime = value.cookingTime
     if (value.difficulty !== undefined) doc.difficulty = value.difficulty
     if (ingredients.length) doc.ingredients = ingredients
     if (instructions.length) doc.instructions = instructions
+    if (Object.keys(nutritionalInfo).length > 0) {
+      doc.nutritionalInfo = nutritionalInfo
+    } else if (value.nutritionalInfo !== undefined) {
+      doc.nutritionalInfo = value.nutritionalInfo
+    }
 
     if (req.file) {
       const { imageUrl, thumbUrl } = await processImage(req.file)

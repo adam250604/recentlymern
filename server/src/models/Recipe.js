@@ -10,6 +10,12 @@ const recipeSchema = new mongoose.Schema(
     instructions: { type: [String], default: [] },
     imageUrl: String,
     thumbUrl: String,
+    nutritionalInfo: {
+      calories: { type: Number, min: 0 },
+      protein: { type: Number, min: 0 },
+      fat: { type: Number, min: 0 },
+      carbs: { type: Number, min: 0 }
+    },
     avgRating: { type: Number, default: 0, index: true },
     ratings: { type: Map, of: Number, default: {} },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

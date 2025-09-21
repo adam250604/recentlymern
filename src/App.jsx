@@ -4,6 +4,8 @@ import Footer from './components/Footer.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
+import ConfirmResetPassword from './pages/ConfirmResetPassword.jsx'
+import VerifyEmail from './pages/VerifyEmail.jsx'
 import Recipes from './pages/Recipes.jsx'
 import RecipeDetail from './pages/RecipeDetail.jsx'
 import RecipeForm from './pages/RecipeForm.jsx'
@@ -21,6 +23,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password/confirm" element={<ConfirmResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />

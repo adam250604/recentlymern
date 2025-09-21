@@ -43,6 +43,21 @@ export default function Recipes() {
     }
   }
 
+  const rateRecipe = async (recipe, value) => {
+    try {
+      await api.post(`/recipes/${recipe.id}/rating`, { value })
+      toast.success('Thanks for rating!')
+      // Update the recipe's average rating and user rating
+      setRecipes((prev) => prev.map((r) => 
+        r.id === recipe.id 
+          ? { ...r, userRating: value, avgRating: (r.avgRating + value) / 2 } // Simple average update
+          : r
+      ))
+    } catch {
+      toast.error('Failed to rate recipe')
+    }
+  }
+
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <div>
@@ -54,7 +69,7 @@ export default function Recipes() {
       ) : (
         <div className="grid">
           {recipes.map((r) => (
-            <RecipeCard key={r.id} recipe={r} onToggleFavorite={toggleFavorite} />
+            <RecipeCard key={r.id} recipe={r} onToggleFavorite={toggleFavorite} onRate={rateRecipe} />
           ))}
         </div>
       )}

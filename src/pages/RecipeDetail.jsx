@@ -107,7 +107,9 @@ export default function RecipeDetail() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <h2 style={{ margin: 0, flex: 1 }}>{recipe.title}</h2>
         <FavoriteToggle active={!!recipe.isFavorite} onToggle={onToggleFavorite} />
-        {isAuthenticated && <Link to={`/recipes/${id}/edit`}>Edit</Link>}
+        {isAuthenticated && user && String(user.id || user._id) === String(recipe.ownerId) && (
+          <Link to={`/recipes/${id}/edit`}>Edit</Link>
+        )}
       </div>
 
       {/* Recommended Recipes */}
@@ -115,7 +117,7 @@ export default function RecipeDetail() {
         <h3>Recommended Recipes</h3>
           <div className="responsive-grid">
           {recommendations.length === 0 ? <div>No recommendations yet.</div> : recommendations.map((r) => (
-            <RecipeCard key={r.id} recipe={r} />
+            <RecipeCard key={r.id} recipe={r} onToggleFavorite={onToggleFavorite} onRate={onRate} />
           ))}
         </div>
       </div>
@@ -162,17 +164,19 @@ export default function RecipeDetail() {
       </div>
 
       {/* Nutritional Information */}
-      <div>
-        <h3>Nutritional Information</h3>
-        <table style={{ borderCollapse: 'collapse', width: '100%', maxWidth: 400 }}>
-          <tbody>
-            <tr><td>Calories</td><td>{recipe.nutrition?.calories ?? 0} kcal</td></tr>
-            <tr><td>Protein</td><td>{recipe.nutrition?.protein ?? 0} g</td></tr>
-            <tr><td>Fat</td><td>{recipe.nutrition?.fat ?? 0} g</td></tr>
-            <tr><td>Carbs</td><td>{recipe.nutrition?.carbs ?? 0} g</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {recipe.nutritionalInfo && Object.keys(recipe.nutritionalInfo).length > 0 && (
+        <div>
+          <h3>Nutritional Information</h3>
+          <table style={{ borderCollapse: 'collapse', width: '100%', maxWidth: 400 }}>
+            <tbody>
+              <tr><td>Calories</td><td>{recipe.nutritionalInfo?.calories ?? 0} kcal</td></tr>
+              <tr><td>Protein</td><td>{recipe.nutritionalInfo?.protein ?? 0} g</td></tr>
+              <tr><td>Fat</td><td>{recipe.nutritionalInfo?.fat ?? 0} g</td></tr>
+              <tr><td>Carbs</td><td>{recipe.nutritionalInfo?.carbs ?? 0} g</td></tr>
+            </tbody>
+          </table>
+        </div>
+      )}
       <div>
         <h3>Instructions</h3>
         <ol>{(recipe.instructions || []).map((step, i) => <li key={i}>{step}</li>)}</ol>

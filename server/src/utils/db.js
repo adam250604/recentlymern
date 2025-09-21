@@ -1,9 +1,9 @@
 ﻿import mongoose from 'mongoose'
 
 export async function connectIfConfigured() {
-  const uri = process.env.MONGO_URI
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI
   if (!uri) {
-    console.log('MONGO_URI not set - using in-memory store')
+    console.log('MONGODB_URI not set - using in-memory store')
     return
   }
   try {

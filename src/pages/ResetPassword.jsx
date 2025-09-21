@@ -10,10 +10,10 @@ export default function ResetPassword() {
     e.preventDefault()
     setLoading(true)
     try {
-      await api.post('/auth/reset-password', { email })
+      await api.post('/auth/reset-password/request', { email })
       toast.success('If the email exists, a reset link has been sent')
-    } catch {
-      toast.error('Failed to request reset')
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to request reset')
     } finally {
       setLoading(false)
     }

@@ -4,7 +4,7 @@
     const filled = i <= value
     stars.push(
       <span key={i} style={{ cursor: 'pointer', fontSize: 20 }} onClick={() => onChange?.(i)}>
-        {filled ? '' : ''}
+        {filled ? '⭐' : '☆'}
       </span>
     )
   }
