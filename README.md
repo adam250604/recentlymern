@@ -96,7 +96,6 @@ This is a full-stack MERN (MongoDB, Express, React, Node.js) recipe sharing plat
 - Favorite toggle on cards/detail
 - Rate a recipe on detail
 - Dashboard and profile updates
-- Follow/unfollow users
 - Add/delete comments
 - Share recipes
 - Account deletion
